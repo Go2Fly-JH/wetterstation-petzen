@@ -117,10 +117,11 @@ def berechne_windverteilung(richtungen):
     verteilung = verteilung.reindex(['N', 'NO', 'O', 'SO', 'S', 'SW', 'W', 'NW'], fill_value=0)
     return verteilung.round(1)
 
-# 🔍 Gerät erkennen (per URL-Parameter ua=mobile)
+#🔍 Gerät erkennen (per URL-Parameter ua=mobile)
 def is_mobile():
-    ua_param = st.experimental_get_query_params().get("ua", [""])[0]
-    return "mobile" in ua_param.lower()
+    ua_param = st.query_params.get("ua", "")
+    return "mobile" in ua_param.lower() if isinstance(ua_param, str) else False
+
 
 # 🖥️ Web-App anzeigen
 st.set_page_config(page_title="Wetterstation Petzen", layout="centered")
