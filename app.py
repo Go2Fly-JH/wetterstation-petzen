@@ -102,13 +102,13 @@ def plot_interactive_lines(times, speeds, gusts, richtungen):
 # 📉 Kompaktes Balkendiagramm für Mobilgeräte (inkl. Richtung oben)
 def plot_mobile_bar(times, speeds, gusts, richtungen):
     fig, ax = plt.subplots(figsize=(6, 3))
-    x_labels = [f"{t}" for t in times[-10:]]
-    bars = ax.bar(x_labels, speeds[-10:], color='skyblue', label='Wind')
-    ax.plot(x_labels, gusts[-10:], color='red', linestyle='--', marker='o', label='Böe')
+    x_labels = [f"{t}" for t in times[-15:]]
+    bars = ax.bar(x_labels, speeds[-15:], color='skyblue', label='Wind')
+    ax.plot(x_labels, gusts[-15:], color='red', linestyle='--', marker='o', label='Böe')
     ax.set_title("Wind, Böen & Richtung (letzte Messwerte)")
     ax.set_ylabel("km/h")
     ax.legend()
-    for bar, richt in zip(bars, richtungen[-10:]):
+    for bar, richt in zip(bars, richtungen[-15:]):
         height = bar.get_height()
         ax.text(bar.get_x() + bar.get_width() / 2, height + 1, richt, ha='center', va='bottom', fontsize=8)
     plt.xticks(rotation=45, ha='right')
