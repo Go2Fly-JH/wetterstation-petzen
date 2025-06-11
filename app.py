@@ -89,7 +89,7 @@ def plot_interactive_lines(times, speeds, gusts, richtungen):
     ))
 
     fig.update_layout(
-        title="📈 Windgeschwindigkeit & Böen über den Tag",
+        title="Windgeschwindigkeit & Böen über den Tag",
         xaxis_title="Uhrzeit",
         yaxis_title="km/h",
         yaxis=dict(range=[0, max(gusts + speeds + [30])]),
@@ -129,7 +129,7 @@ def is_mobile():
 
 # 🖥️ Web-App anzeigen
 st.set_page_config(page_title="Wetterstation Petzen", layout="centered")
-st.title("Wetterstation Petzen – Aktuelle Tagesdaten")
+st.title("🌤️Wetterstation Petzen – Aktuelle Tagesdaten")
 st.caption(f"Datum: {today}")
 
 # 📦 Daten laden
@@ -139,13 +139,13 @@ if times:
     st.pyplot(plot_windrose(speeds_avg, dirs_deg))
 
     if is_mobile():
-        st.markdown("### 📉 Kompakte Übersicht (Mobil)")
+        st.markdown("### Kompakte Übersicht (Mobil)")
         st.pyplot(plot_mobile_bar(times, speeds_avg, gusts_high, richtungen))
     else:
-        st.markdown("### 📈 Windverlauf (Desktop)")
+        st.markdown("### Windverlauf (Desktop)")
         st.plotly_chart(plot_interactive_lines(times, speeds_avg, gusts_high, richtungen), use_container_width=True)
 
-    st.markdown("### 🧽 Windverteilung (heute in %)")
+    st.markdown("###Windverteilung (heute in %)")
     verteilung = berechne_windverteilung(richtungen)
     df_verteilung = pd.DataFrame({
         "Richtung": verteilung.index,
