@@ -62,7 +62,8 @@ def plot_windrose(speeds, dirs_deg):
     return fig
 
 # 📈 Plotly-Diagramm mit beiden Linien
-def plot_interactive_lines(times, speeds, gusts):
+
+def plot_interactive_lines(times, speeds, gusts, richtungen):
     fig = go.Figure()
 
     fig.add_trace(go.Scatter(
@@ -70,7 +71,7 @@ def plot_interactive_lines(times, speeds, gusts):
         y=speeds,
         mode='lines+markers+text',
         name="Windgeschwindigkeit",
-        text=[f"{s:.0f} km/h" for s in speeds],
+        text=[f"{r}, {s:.0f} km/h" for s, r in zip(speeds, richtungen)],
         textposition="top center",
         line=dict(color='blue'),
         marker=dict(size=6)
@@ -101,12 +102,15 @@ def plot_interactive_lines(times, speeds, gusts):
 # 📉 Kompaktes Balkendiagramm für Mobilgeräte (inkl. Richtung oben)
 def plot_mobile_bar(times, speeds, gusts, richtungen):
     fig, ax = plt.subplots(figsize=(6, 3))
-    x_labels = [f"{r}\n{t}" for t, r in zip(times[-10:], richtungen[-10:])]
-    ax.bar(x_labels, speeds[-10:], color='skyblue', label='Wind')
+    x_labels = [f"{t}" for t in times[-10:]]
+    bars = ax.bar(x_labels, speeds[-10:], color='skyblue', label='Wind')
     ax.plot(x_labels, gusts[-10:], color='red', linestyle='--', marker='o', label='Böe')
     ax.set_title("Wind, Böen & Richtung (letzte Messwerte)")
     ax.set_ylabel("km/h")
     ax.legend()
+    for bar, richt in zip(bars, richtungen[-10:]):
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width() / 2, height + 1, richt, ha='center', va='bottom', fontsize=8)
     plt.xticks(rotation=45, ha='right')
     fig.tight_layout()
     return fig
@@ -139,7 +143,7 @@ if times:
         st.pyplot(plot_mobile_bar(times, speeds_avg, gusts_high, richtungen))
     else:
         st.markdown("### 📈 Windverlauf (Desktop)")
-        st.plotly_chart(plot_interactive_lines(times, speeds_avg, gusts_high), use_container_width=True)
+        st.plotly_chart(plot_interactive_lines(times, speeds_avg, gusts_high, richtungen), use_container_width=True)
 
     st.markdown("### 🧽 Windverteilung (heute in %)")
     verteilung = berechne_windverteilung(richtungen)
