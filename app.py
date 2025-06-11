@@ -101,13 +101,14 @@ def plot_interactive_lines(times, speeds, gusts):
 # 📉 Kompaktes Balkendiagramm für Mobilgeräte
 def plot_mobile_bar(times, speeds, gusts):
     fig, ax = plt.subplots(figsize=(6, 3))
-    ax.bar(times[-30:], speeds[-30:], color='skyblue', label='Wind')
-    ax.plot(times[-30:], gusts[-30:], color='red', linestyle='--', marker='o', label='Böe')
+    ax.bar(times[-15:], speeds[-15:], color='skyblue', label='Wind')
+    ax.plot(times[-15:], gusts[-15:], color='red', linestyle='--', marker='o', label='Böe')
     ax.set_title("Wind & Böen (letzte Messwerte)")
     ax.set_ylabel("km/h")
     ax.legend()
     plt.xticks(rotation=45, ha='right')
     fig.tight_layout()
+    hovermode="x unified",
     return fig
 
 # 📋 Prozentuale Windverteilung
