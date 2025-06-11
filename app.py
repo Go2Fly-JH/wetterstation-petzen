@@ -101,8 +101,8 @@ def plot_interactive_lines(times, speeds, gusts):
 # 📉 Kompaktes Balkendiagramm für Mobilgeräte
 def plot_mobile_bar(times, speeds, gusts):
     fig, ax = plt.subplots(figsize=(6, 3))
-    ax.bar(times[-10:], speeds[-10:], color='skyblue', label='Wind')
-    ax.plot(times[-10:], gusts[-10:], color='red', linestyle='--', marker='o', label='Böe')
+    ax.bar(times[-30:], speeds[-10:], color='skyblue', label='Wind')
+    ax.plot(times[-30:], gusts[-10:], color='red', linestyle='--', marker='o', label='Böe')
     ax.set_title("Wind & Böen (letzte Messwerte)")
     ax.set_ylabel("km/h")
     ax.legend()
