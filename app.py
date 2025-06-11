@@ -139,13 +139,13 @@ if times:
     st.pyplot(plot_windrose(speeds_avg, dirs_deg))
 
     if is_mobile():
-        st.markdown("Kompakte Übersicht (Mobil)")
+        st.markdown("Kompakte Übersicht")
         st.pyplot(plot_mobile_bar(times, speeds_avg, gusts_high, richtungen))
     else:
-        st.markdown("### Windverlauf (Desktop)")
+        st.markdown("Windverlauf (Desktop)")
         st.plotly_chart(plot_interactive_lines(times, speeds_avg, gusts_high, richtungen), use_container_width=True)
 
-    st.markdown("###Windverteilung (heute in %)")
+    st.markdown("Windverteilung (heute in %)")
     verteilung = berechne_windverteilung(richtungen)
     df_verteilung = pd.DataFrame({
         "Richtung": verteilung.index,
