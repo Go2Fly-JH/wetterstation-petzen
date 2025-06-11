@@ -129,7 +129,7 @@ def is_mobile():
 
 # 🖥️ Web-App anzeigen
 st.set_page_config(page_title="Wetterstation Petzen", layout="centered")
-st.title("🌤️ Wetterstation Petzen – Aktuelle Tagesdaten.....")
+st.title("🌤️ Wetterstation Petzen – Aktuelle Tagesdaten")
 st.caption(f"Datum: {today}")
 
 # 📦 Daten laden
