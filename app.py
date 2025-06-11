@@ -129,7 +129,7 @@ def is_mobile():
 
 # 🖥️ Web-App anzeigen
 st.set_page_config(page_title="Wetterstation Petzen", layout="centered")
-st.title("🌤️Wetterstation Petzen – Aktuelle Tagesdaten")
+st.title("🌤️ Wetterstation Petzen – Aktuelle Tagesdaten")
 st.caption(f"Datum: {today}")
 
 # 📦 Daten laden
@@ -139,7 +139,7 @@ if times:
     st.pyplot(plot_windrose(speeds_avg, dirs_deg))
 
     if is_mobile():
-        st.markdown("### Kompakte Übersicht (Mobil)")
+        st.markdown("Kompakte Übersicht (Mobil)")
         st.pyplot(plot_mobile_bar(times, speeds_avg, gusts_high, richtungen))
     else:
         st.markdown("### Windverlauf (Desktop)")
@@ -154,7 +154,7 @@ if times:
     st.dataframe(df_verteilung.style.format({"Anteil (%)": "{:.1f}"}), use_container_width=True)
 
     # 📋 Einzelne Messwerte
-    st.markdown("### 📋 Einzelne Messwerte")
+    st.markdown("Einzelne Messwerte")
     df_messwerte = pd.DataFrame({
         "Uhrzeit": times,
         "Wind (km/h)": speeds_avg,
