@@ -98,10 +98,10 @@ def plot_interactive_lines(times, speeds, gusts):
     )
     return fig
 
-# 📉 Kompaktes Balkendiagramm für Mobilgeräte (inkl. Richtung)
+# 📉 Kompaktes Balkendiagramm für Mobilgeräte (inkl. Richtung oben)
 def plot_mobile_bar(times, speeds, gusts, richtungen):
     fig, ax = plt.subplots(figsize=(6, 3))
-    x_labels = [f"{t}\n{r}" for t, r in zip(times[-10:], richtungen[-10:])]
+    x_labels = [f"{r}\n{t}" for t, r in zip(times[-10:], richtungen[-10:])]
     ax.bar(x_labels, speeds[-10:], color='skyblue', label='Wind')
     ax.plot(x_labels, gusts[-10:], color='red', linestyle='--', marker='o', label='Böe')
     ax.set_title("Wind, Böen & Richtung (letzte Messwerte)")
@@ -125,7 +125,7 @@ def is_mobile():
 
 # 🖥️ Web-App anzeigen
 st.set_page_config(page_title="Wetterstation Petzen", layout="centered")
-st.title("🌤️ Wetterstation Petzen – Aktuelle Tagesdaten")
+st.title("Wetterstation Petzen – Aktuelle Tagesdaten")
 st.caption(f"Datum: {today}")
 
 # 📦 Daten laden
