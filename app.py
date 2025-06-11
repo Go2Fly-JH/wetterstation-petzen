@@ -98,17 +98,17 @@ def plot_interactive_lines(times, speeds, gusts):
     )
     return fig
 
-# 📉 Kompaktes Balkendiagramm für Mobilgeräte
-def plot_mobile_bar(times, speeds, gusts):
+# 📉 Kompaktes Balkendiagramm für Mobilgeräte (inkl. Richtung)
+def plot_mobile_bar(times, speeds, gusts, richtungen):
     fig, ax = plt.subplots(figsize=(6, 3))
-    ax.bar(times[-15:], speeds[-15:], color='skyblue', label='Wind')
-    ax.plot(times[-15:], gusts[-15:], color='red', linestyle='--', marker='o', label='Böe')
-    ax.set_title("Wind & Böen (letzte Messwerte)")
+    x_labels = [f"{t}\n{r}" for t, r in zip(times[-10:], richtungen[-10:])]
+    ax.bar(x_labels, speeds[-10:], color='skyblue', label='Wind')
+    ax.plot(x_labels, gusts[-10:], color='red', linestyle='--', marker='o', label='Böe')
+    ax.set_title("Wind, Böen & Richtung (letzte Messwerte)")
     ax.set_ylabel("km/h")
     ax.legend()
     plt.xticks(rotation=45, ha='right')
     fig.tight_layout()
-    hovermode="x unified",
     return fig
 
 # 📋 Prozentuale Windverteilung
@@ -118,11 +118,10 @@ def berechne_windverteilung(richtungen):
     verteilung = verteilung.reindex(['N', 'NO', 'O', 'SO', 'S', 'SW', 'W', 'NW'], fill_value=0)
     return verteilung.round(1)
 
-#🔍 Gerät erkennen (per URL-Parameter ua=mobile)
+# 🔍 Gerät erkennen (per URL-Parameter ua=mobile)
 def is_mobile():
     ua_param = st.query_params.get("ua", "")
     return "mobile" in ua_param.lower() if isinstance(ua_param, str) else False
-
 
 # 🖥️ Web-App anzeigen
 st.set_page_config(page_title="Wetterstation Petzen", layout="centered")
@@ -136,13 +135,13 @@ if times:
     st.pyplot(plot_windrose(speeds_avg, dirs_deg))
 
     if is_mobile():
-        st.markdown("### Kompakte Übersicht (Mobil)")
-        st.pyplot(plot_mobile_bar(times, speeds_avg, gusts_high))
+        st.markdown("### 📉 Kompakte Übersicht (Mobil)")
+        st.pyplot(plot_mobile_bar(times, speeds_avg, gusts_high, richtungen))
     else:
         st.markdown("### 📈 Windverlauf (Desktop)")
         st.plotly_chart(plot_interactive_lines(times, speeds_avg, gusts_high), use_container_width=True)
 
-    st.markdown("### Windverteilung (heute in %)")
+    st.markdown("### 🧽 Windverteilung (heute in %)")
     verteilung = berechne_windverteilung(richtungen)
     df_verteilung = pd.DataFrame({
         "Richtung": verteilung.index,
@@ -151,7 +150,7 @@ if times:
     st.dataframe(df_verteilung.style.format({"Anteil (%)": "{:.1f}"}), use_container_width=True)
 
     # 📋 Einzelne Messwerte
-    st.markdown("### Einzelne Messwerte")
+    st.markdown("### 📋 Einzelne Messwerte")
     df_messwerte = pd.DataFrame({
         "Uhrzeit": times,
         "Wind (km/h)": speeds_avg,
