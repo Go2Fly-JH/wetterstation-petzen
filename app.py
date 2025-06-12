@@ -99,14 +99,14 @@ def plot_interactive_lines(times, speeds, gusts, richtungen):
 
 # 📉 Kompaktes Balkendiagramm für Mobilgeräte (inkl. Richtung oben)
 def plot_mobile_bar(times, speeds, gusts, richtungen):
-    fig, ax = plt.subplots(figsize=(6, 3))
-    x_labels = [f"{t}" for t in times[-15:]]
-    bars = ax.bar(x_labels, speeds[-15:], color='skyblue', label='Wind')
-    ax.plot(x_labels, gusts[-15:], color='red', linestyle='--', marker='o', label='Böe')
-    ax.set_title("Wind, Böen & Richtung (letzte Messwerte)")
+    fig, ax = plt.subplots(figsize=(10, 4))  # größere Breite für viele Werte
+    x_labels = [f"{t}" for t in times]
+    bars = ax.bar(x_labels, speeds, color='skyblue', label='Wind')
+    ax.plot(x_labels, gusts, color='red', linestyle='--', marker='o', label='Böe')
+    ax.set_title("Wind, Böen & Richtung (alle Messwerte)")
     ax.set_ylabel("km/h")
     ax.legend()
-    for bar, richt in zip(bars, richtungen[-15:]):
+    for bar, richt in zip(bars, richtungen):
         height = bar.get_height()
         ax.text(bar.get_x() + bar.get_width() / 2, height + 1, richt, ha='center', va='bottom', fontsize=8)
     plt.xticks(rotation=45, ha='right')
@@ -125,7 +125,7 @@ def is_mobile():
     ua_param = st.query_params.get("ua", "")
     return "mobile" in ua_param.lower() if isinstance(ua_param, str) else False
 
-# 🖥️ Web-App anzeigen
+# 🗅️ Web-App anzeigen
 st.set_page_config(page_title="Wetterstation Petzen", layout="centered")
 st.title("🌤️ Wetterstation Petzen – Aktuelle Tagesdaten")
 st.caption(f"Datum: {today}")
