@@ -30,13 +30,14 @@ def get_data():
         r = requests.get(url)
         r.raise_for_status()
         data = r.json().get("observations", [])
-        times, speeds_avg, gusts_high, dirs_deg, richtungen = [], [], [], [], []
+        times, speeds_avg, gusts_high, dirs_deg, richtungen, temps = [], [], [], [], [], []
         for obs in data:
             speed = obs.get("metric", {}).get("windspeedAvg")
             gust = obs.get("metric", {}).get("windgustHigh")
             direction = obs.get("winddirAvg")
+            temp = obs.get("metric", {}).get("temp")
             time = obs.get("obsTimeLocal")
-            if speed is not None and gust is not None and direction and time:
+            if speed is not None and gust is not None and direction and time and temp is not None:
                 zeit_kurz = time[-8:-3]  # "14:05"
                 stunde = int(zeit_kurz[:2])
                 if stunde >= 7:
@@ -45,12 +46,17 @@ def get_data():
                     gusts_high.append(gust)
                     dirs_deg.append(direction)
                     richtungen.append(grad_to_richtung(direction))
-        return times, speeds_avg, gusts_high, dirs_deg, richtungen
-     except Exception as e:
+                    temps.append(temp)
+        return times, speeds_avg, gusts_high, dirs_deg, richtungen, temps
+    except Exception as e:
         st.error(f"Fehler beim Abrufen der Wetterdaten: {e}")
-        st.text(f"URL: {url}")
-        st.json(r.json() if 'r' in locals() and r.headers.get('Content-Type', '').startswith('application/json') else {})
+        st.text(f"Verwendete API-URL: {url}")
+        try:
+            st.json(r.json())
+        except:
+            st.text("Antwort war kein JSON.")
         return [], [], [], [], [], []
+
 
 # 🌬️ Windrose
 def plot_windrose(speeds, dirs_deg):
