@@ -36,7 +36,7 @@ def get_data():
             gust = obs.get("metric", {}).get("windgustHigh")
             direction = obs.get("winddirAvg")
             time = obs.get("obsTimeLocal")
-            if speed is not None and gust is not None and direction and time:
+            if speed is not None and gust is not None and direction is not None and time:
                 zeit_kurz = time[-8:-3]  # "14:05"
                 times.append(zeit_kurz)
                 speeds_avg.append(speed)
@@ -99,11 +99,11 @@ def plot_interactive_lines(times, speeds, gusts, richtungen):
 
 # 📉 Kompaktes Balkendiagramm für Mobilgeräte (inkl. Richtung oben)
 def plot_mobile_bar(times, speeds, gusts, richtungen):
-    fig, ax = plt.subplots(figsize=(10, 4))  # größere Breite für viele Werte
-    x_labels = [f"{t}" for t in times]
+    fig, ax = plt.subplots(figsize=(8, 4))
+    x_labels = [f"{t}" for t in times]  # Zeige alle Zeiten
     bars = ax.bar(x_labels, speeds, color='skyblue', label='Wind')
     ax.plot(x_labels, gusts, color='red', linestyle='--', marker='o', label='Böe')
-    ax.set_title("Wind, Böen & Richtung (alle Messwerte)")
+    ax.set_title("Wind, Böen & Richtung")
     ax.set_ylabel("km/h")
     ax.legend()
     for bar, richt in zip(bars, richtungen):
@@ -125,7 +125,7 @@ def is_mobile():
     ua_param = st.query_params.get("ua", "")
     return "mobile" in ua_param.lower() if isinstance(ua_param, str) else False
 
-# 🗅️ Web-App anzeigen
+# 🖥️ Web-App anzeigen
 st.set_page_config(page_title="Wetterstation Petzen", layout="centered")
 st.title("🌤️ Wetterstation Petzen – Aktuelle Tagesdaten")
 st.caption(f"Datum: {today}")
