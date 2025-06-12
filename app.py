@@ -1,7 +1,6 @@
 import streamlit as st
 import requests
-from datetime import datetime
-import pytz
+from datetime import date
 import pandas as pd
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
@@ -10,8 +9,7 @@ import numpy as np
 # 📱 Station und API
 API_KEY = '4fb8bb1278864b31b8bb127886fb3132'
 STATION_ID = 'IKRNTENU3'
-vienna = pytz.timezone('Europe/Vienna')
-today = datetime.now(vienna).strftime("%Y%m%d")
+today = date.today().strftime("%Y%m%d")
 
 # 🔗 API-URL
 url = (
@@ -32,25 +30,25 @@ def get_data():
         r = requests.get(url)
         r.raise_for_status()
         data = r.json().get("observations", [])
-        times, speeds_avg, gusts_high, dirs_deg, richtungen, temps = [], [], [], [], [], []
+        times, speeds_avg, gusts_high, dirs_deg, richtungen = [], [], [], [], []
         for obs in data:
             speed = obs.get("metric", {}).get("windspeedAvg")
             gust = obs.get("metric", {}).get("windgustHigh")
             direction = obs.get("winddirAvg")
-            temp = obs.get("metric", {}).get("temp")
             time = obs.get("obsTimeLocal")
-            if speed is not None and gust is not None and direction and time and temp is not None:
+            if speed is not None and gust is not None and direction and time:
                 zeit_kurz = time[-8:-3]  # "14:05"
-                times.append(zeit_kurz)
-                speeds_avg.append(speed)
-                gusts_high.append(gust)
-                dirs_deg.append(direction)
-                richtungen.append(grad_to_richtung(direction))
-                temps.append(temp)
-        return times, speeds_avg, gusts_high, dirs_deg, richtungen, temps
+                stunde = int(zeit_kurz[:2])
+                if stunde >= 7:
+                    times.append(zeit_kurz)
+                    speeds_avg.append(speed)
+                    gusts_high.append(gust)
+                    dirs_deg.append(direction)
+                    richtungen.append(grad_to_richtung(direction))
+        return times, speeds_avg, gusts_high, dirs_deg, richtungen
     except Exception as e:
         st.error(f"Fehler beim Abrufen der Wetterdaten: {e}")
-        return [], [], [], [], [], []
+        return [], [], [], [], []
 
 # 🌬️ Windrose
 def plot_windrose(speeds, dirs_deg):
@@ -91,7 +89,7 @@ def plot_interactive_lines(times, speeds, gusts, richtungen):
     ))
 
     fig.update_layout(
-        title="📈 Windgeschwindigkeit & Böen über den Tag",
+        title="Windgeschwindigkeit & Böen über den Tag",
         xaxis_title="Uhrzeit",
         yaxis_title="km/h",
         yaxis=dict(range=[0, max(gusts + speeds + [30])]),
@@ -104,25 +102,15 @@ def plot_interactive_lines(times, speeds, gusts, richtungen):
 # 📉 Kompaktes Balkendiagramm für Mobilgeräte (inkl. Richtung oben)
 def plot_mobile_bar(times, speeds, gusts, richtungen):
     fig, ax = plt.subplots(figsize=(6, 3))
-    x_labels = [f"{t}" for t in times[-10:]]
-    bars = ax.bar(x_labels, speeds[-10:], color='skyblue', label='Wind')
-    ax.plot(x_labels, gusts[-10:], color='red', linestyle='--', marker='o', label='Böe')
+    x_labels = [f"{t}" for t in times[-15:]]
+    bars = ax.bar(x_labels, speeds[-15:], color='skyblue', label='Wind')
+    ax.plot(x_labels, gusts[-15:], color='red', linestyle='--', marker='o', label='Böe')
     ax.set_title("Wind, Böen & Richtung (letzte Messwerte)")
     ax.set_ylabel("km/h")
     ax.legend()
-    for bar, richt in zip(bars, richtungen[-10:]):
+    for bar, richt in zip(bars, richtungen[-15:]):
         height = bar.get_height()
         ax.text(bar.get_x() + bar.get_width() / 2, height + 1, richt, ha='center', va='bottom', fontsize=8)
-    plt.xticks(rotation=45, ha='right')
-    fig.tight_layout()
-    return fig
-
-# 📋 Temperaturverlauf (Balkendiagramm)
-def plot_temperature_bar(times, temps):
-    fig, ax = plt.subplots(figsize=(6, 3))
-    ax.bar(times[-10:], temps[-10:], color='orange')
-    ax.set_title("🌡️ Temperaturverlauf")
-    ax.set_ylabel("°C")
     plt.xticks(rotation=45, ha='right')
     fig.tight_layout()
     return fig
@@ -141,24 +129,23 @@ def is_mobile():
 
 # 🖥️ Web-App anzeigen
 st.set_page_config(page_title="Wetterstation Petzen", layout="centered")
-st.title("Wetterstation Petzen – Aktuelle Tagesdaten")
+st.title("🌤️ Wetterstation Petzen – Aktuelle Tagesdaten")
 st.caption(f"Datum: {today}")
 
 # 📦 Daten laden
-times, speeds_avg, gusts_high, dirs_deg, richtungen, temps = get_data()
+times, speeds_avg, gusts_high, dirs_deg, richtungen = get_data()
 
 if times:
     st.pyplot(plot_windrose(speeds_avg, dirs_deg))
 
     if is_mobile():
-        st.markdown("### 📉 Kompakte Übersicht (Mobil)")
+        st.markdown("Kompakte Übersicht")
         st.pyplot(plot_mobile_bar(times, speeds_avg, gusts_high, richtungen))
-        st.pyplot(plot_temperature_bar(times, temps))
     else:
-        st.markdown("### 📈 Windverlauf (Desktop)")
+        st.markdown("Windverlauf (Desktop)")
         st.plotly_chart(plot_interactive_lines(times, speeds_avg, gusts_high, richtungen), use_container_width=True)
 
-    st.markdown("### 🧽 Windverteilung (heute in %)")
+    st.markdown("Windverteilung (heute in %)")
     verteilung = berechne_windverteilung(richtungen)
     df_verteilung = pd.DataFrame({
         "Richtung": verteilung.index,
@@ -167,13 +154,12 @@ if times:
     st.dataframe(df_verteilung.style.format({"Anteil (%)": "{:.1f}"}), use_container_width=True)
 
     # 📋 Einzelne Messwerte
-    st.markdown("### 📋 Einzelne Messwerte")
+    st.markdown("Einzelne Messwerte")
     df_messwerte = pd.DataFrame({
         "Uhrzeit": times,
         "Wind (km/h)": speeds_avg,
         "Windböe max. (km/h)": gusts_high,
-        "Windrichtung": richtungen,
-        "Temperatur (°C)": temps
+        "Windrichtung": richtungen
     })
     st.dataframe(df_messwerte, use_container_width=True)
 
