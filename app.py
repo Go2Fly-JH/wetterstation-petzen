@@ -39,14 +39,12 @@ def get_data():
             time = obs.get("obsTimeLocal")
             if speed is not None and gust is not None and direction and time and temp is not None:
                 zeit_kurz = time[-8:-3]  # "14:05"
-                stunde = int(zeit_kurz[:2])
-                if stunde >= 7:
-                    times.append(zeit_kurz)
-                    speeds_avg.append(speed)
-                    gusts_high.append(gust)
-                    dirs_deg.append(direction)
-                    richtungen.append(grad_to_richtung(direction))
-                    temps.append(temp)
+                times.append(zeit_kurz)
+                speeds_avg.append(speed)
+                gusts_high.append(gust)
+                dirs_deg.append(direction)
+                richtungen.append(grad_to_richtung(direction))
+                temps.append(temp)
         return times, speeds_avg, gusts_high, dirs_deg, richtungen, temps
     except Exception as e:
         st.error(f"Fehler beim Abrufen der Wetterdaten: {e}")
@@ -63,7 +61,8 @@ def plot_windrose(speeds, dirs_deg):
     ax.set_title("🌬️ Windrose")
     return fig
 
-# 📈 Interaktives Plotly-Diagramm für Desktop
+# 📈 Plotly-Diagramm mit beiden Linien
+
 def plot_interactive_lines(times, speeds, gusts, richtungen):
     fig = go.Figure()
 
@@ -100,10 +99,10 @@ def plot_interactive_lines(times, speeds, gusts, richtungen):
     )
     return fig
 
-# 📉 Kompaktes Balkendiagramm für Mobilgeräte
+# 📉 Kompaktes Balkendiagramm für Mobilgeräte (inkl. Richtung oben)
 def plot_mobile_bar(times, speeds, gusts, richtungen):
     fig, ax = plt.subplots(figsize=(6, 3))
-    x_labels = times[-10:]
+    x_labels = [f"{t}" for t in times[-10:]]
     bars = ax.bar(x_labels, speeds[-10:], color='skyblue', label='Wind')
     ax.plot(x_labels, gusts[-10:], color='red', linestyle='--', marker='o', label='Böe')
     ax.set_title("Wind, Böen & Richtung (letzte Messwerte)")
@@ -116,7 +115,7 @@ def plot_mobile_bar(times, speeds, gusts, richtungen):
     fig.tight_layout()
     return fig
 
-# 🌡️ Temperaturverlauf als Balkendiagramm
+# 📋 Temperaturverlauf (Balkendiagramm)
 def plot_temperature_bar(times, temps):
     fig, ax = plt.subplots(figsize=(6, 3))
     ax.bar(times[-10:], temps[-10:], color='orange')
@@ -133,7 +132,7 @@ def berechne_windverteilung(richtungen):
     verteilung = verteilung.reindex(['N', 'NO', 'O', 'SO', 'S', 'SW', 'W', 'NW'], fill_value=0)
     return verteilung.round(1)
 
-# 🔍 Gerät erkennen (per URL-Parameter ?ua=mobile)
+# 🔍 Gerät erkennen (per URL-Parameter ua=mobile)
 def is_mobile():
     ua_param = st.query_params.get("ua", "")
     return "mobile" in ua_param.lower() if isinstance(ua_param, str) else False
