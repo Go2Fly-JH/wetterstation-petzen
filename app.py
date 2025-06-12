@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
-from datetime import date
+from datetime import datetime
+import pytz
 import pandas as pd
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
@@ -9,7 +10,8 @@ import numpy as np
 # 📱 Station und API
 API_KEY = '4fb8bb1278864b31b8bb127886fb3132'
 STATION_ID = 'IKRNTENU3'
-today = date.today().strftime("%Y%m%d")
+vienna = pytz.timezone('Europe/Vienna')
+today = datetime.now(vienna).strftime("%Y%m%d")
 
 # 🔗 API-URL
 url = (
