@@ -38,13 +38,11 @@ def get_data():
             time = obs.get("obsTimeLocal")
             if speed is not None and gust is not None and direction and time:
                 zeit_kurz = time[-8:-3]  # "14:05"
-                stunde = int(zeit_kurz[:2])
-                if stunde >= 7:
-                    times.append(zeit_kurz)
-                    speeds_avg.append(speed)
-                    gusts_high.append(gust)
-                    dirs_deg.append(direction)
-                    richtungen.append(grad_to_richtung(direction))
+                times.append(zeit_kurz)
+                speeds_avg.append(speed)
+                gusts_high.append(gust)
+                dirs_deg.append(direction)
+                richtungen.append(grad_to_richtung(direction))
         return times, speeds_avg, gusts_high, dirs_deg, richtungen
     except Exception as e:
         st.error(f"Fehler beim Abrufen der Wetterdaten: {e}")
