@@ -46,9 +46,11 @@ def get_data():
                     dirs_deg.append(direction)
                     richtungen.append(grad_to_richtung(direction))
         return times, speeds_avg, gusts_high, dirs_deg, richtungen
-    except Exception as e:
+     except Exception as e:
         st.error(f"Fehler beim Abrufen der Wetterdaten: {e}")
-        return [], [], [], [], []
+        st.text(f"URL: {url}")
+        st.json(r.json() if 'r' in locals() and r.headers.get('Content-Type', '').startswith('application/json') else {})
+        return [], [], [], [], [], []
 
 # 🌬️ Windrose
 def plot_windrose(speeds, dirs_deg):
