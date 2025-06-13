@@ -6,6 +6,9 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import numpy as np
 
+# 🖥️ Web-App anzeigen
+st.set_page_config(page_title="Wetterstation Petzen", layout="centered")
+
 # 📱 Station und API
 API_KEY = '4fb8bb1278864b31b8bb127886fb3132'
 STATION_ID = 'IKRNTENU3'
@@ -28,7 +31,6 @@ if st.button("🔄 Daten aktualisieren"):
     st.cache_data.clear()
 
 # 📊 Daten abrufen
-# Hinweis: Cache kann deaktiviert werden, wenn immer aktuelle Daten nötig sind
 @st.cache_data(ttl=600)
 def get_data():
     try:
@@ -130,8 +132,6 @@ def is_mobile():
     ua_param = st.query_params.get("ua", "")
     return "mobile" in ua_param.lower() if isinstance(ua_param, str) else False
 
-# 🖥️ Web-App anzeigen
-st.set_page_config(page_title="Wetterstation Petzen", layout="centered")
 st.title("🌤️ Wetterstation Petzen – Aktuelle Tagesdaten")
 st.caption(f"Datum: {today}")
 
