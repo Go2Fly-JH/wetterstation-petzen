@@ -23,13 +23,19 @@ def grad_to_richtung(deg):
     ix = int((deg + 22.5) % 360 / 45)
     return richtungen[ix]
 
+# 🔄 Optionaler Button zum Aktualisieren
+if st.button("🔄 Daten aktualisieren"):
+    st.cache_data.clear()
+
 # 📊 Daten abrufen
+# Hinweis: Cache kann deaktiviert werden, wenn immer aktuelle Daten nötig sind
 @st.cache_data(ttl=600)
 def get_data():
     try:
         r = requests.get(url)
         r.raise_for_status()
         data = r.json().get("observations", [])
+        data = sorted(data, key=lambda x: x.get("obsTimeLocal", ""))  # chronologisch sortieren
         times, speeds_avg, gusts_high, dirs_deg, richtungen = [], [], [], [], []
         for obs in data:
             speed = obs.get("metric", {}).get("windspeedAvg")
@@ -60,7 +66,6 @@ def plot_windrose(speeds, dirs_deg):
     return fig
 
 # 📈 Plotly-Diagramm mit beiden Linien
-
 def plot_interactive_lines(times, speeds, gusts, richtungen):
     fig = go.Figure()
 
@@ -100,7 +105,7 @@ def plot_interactive_lines(times, speeds, gusts, richtungen):
 # 📉 Kompaktes Balkendiagramm für Mobilgeräte (inkl. Richtung oben)
 def plot_mobile_bar(times, speeds, gusts, richtungen):
     fig, ax = plt.subplots(figsize=(8, 4))
-    x_labels = [f"{t}" for t in times]  # Zeige alle Zeiten
+    x_labels = [f"{t}" for t in times]
     bars = ax.bar(x_labels, speeds, color='skyblue', label='Wind')
     ax.plot(x_labels, gusts, color='red', linestyle='--', marker='o', label='Böe')
     ax.set_title("Wind, Böen & Richtung")
